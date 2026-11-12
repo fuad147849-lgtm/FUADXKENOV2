@@ -368,6 +368,10 @@ function finishRound(){
   $("startBtn").textContent = "አዲስ ጨዋታ ጀምር";
 
   updateGrid();
+
+  setTimeout(() => {
+    startGame();
+  }, 5000);
 }
 
 showCoins();
