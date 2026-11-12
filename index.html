@@ -1,12 +1,96 @@
-<!DOCTYPE html>
-<html lang="am">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FUADX KENO</title>
-</head>
-<body>
-  <h1>FUADX KENO</h1>
-  <p>Welcome to FUADX KENO V2</p>
+
+let name=document.getElementById("playerName").value.trim();
+ if(!name){alert("እባክህ ስም አስገባ");return}
+ if(selected.length<1){alert("ቢያንስ 1 ቁጥር ምረጥ");return}
+ if(tickets.filter(t=>t.name===name).length>=10){
+  alert("እስከ 10 እጣዎች ብቻ ነው");
+  return;
+ }
+ tickets.push({name,nums:[...selected]});
+ selected=[];
+ document.querySelectorAll(".num").forEach(b=>b.classList.remove("selected"));
+ document.getElementById("count").textContent="0";
+ showTickets();
+}
+
+function showTickets(){
+ let mine=document.getElementById("myTickets");
+ mine.innerHTML="<b>የእኔ እጣዎች፦</b>";
+ tickets.forEach((t,i)=>{
+  mine.innerHTML+=`<div class="small">${i+1}. ${t.name}: ${t.nums.join(", ")}</div>`;
+ });
+ let names=[...new Set(tickets.map(t=>t.name))];
+ document.getElementById("players").innerHTML=names.map(name=>{
+  let ts=tickets.filter(t=>t.name===name);
+  return `<div class="player"><b>${name}</b> (${ts.length} እጣዎች)`+
+   ts.map(t=>`<div class="ticket">${t.nums.map(n=>
+    `<span class="chip ${drawn.includes(n)?"hit":""}">${n}</span>`
+   ).join("")}</div>`).join("")+"</div>";
+ }).join("");
+}
+
+function startDraw(){
+ phase="draw";
+ timeLeft=20;
+ drawIndex=0;
+ drawn=[];
+ selected=[];
+ document.getElementById("status").textContent="የዕጣ ማውጫ ጊዜ";
+ document.getElementById("drawBox").innerHTML="";
+ let pool=Array.from({length:80},(_,i)=>i+1);
+ for(let i=pool.length-1;i>0;i--){
+  let j=Math.floor(Math.random()*(i+1));
+  [pool[i],pool[j]]=[pool[j],pool[i]];
+ }
+ drawn=pool.slice(0,20);
+ document.getElementById("timer").textContent=timeLeft;
+ clearInterval(timerInterval);
+ clearInterval(drawInterval);
+ drawInterval=setInterval(()=>{
+  if(drawIndex<20){
+   let n=drawn[drawIndex];
+   document.getElementById("drawBox").innerHTML+=`<span>${n}</span>`;
+   drawIndex++;
+   showTickets();
+  }else{
+   clearInterval(drawInterval);
+   startRound();
+  }
+ },1000);
+ timerInterval=setInterval(()=>{
+  timeLeft--;
+  document.getElementById("timer").textContent=timeLeft;
+  if(timeLeft<=0)clearInterval(timerInterval);
+ },1000);
+}
+
+function startRound(){
+ clearInterval(timerInterval);
+ clearInterval(drawInterval);
+ phase="select";
+ tickets=[];
+ drawn=[];
+ selected=[];
+ timeLeft=60;
+ document.getElementById("status").textContent="አዲስ ዙር - የቁጥር ምርጫ";
+ document.getElementById("timer").textContent="60";
+ document.getElementById("drawBox").innerHTML="";
+ document.getElementById("players").innerHTML="";
+ document.getElementById("myTickets").innerHTML="";
+ document.getElementById("count").textContent="0";
+ document.querySelectorAll(".num").forEach(b=>b.classList.remove("selected"));
+ timerInterval=setInterval(()=>{
+  timeLeft--;
+  document.getElementById("timer").textContent=timeLeft;
+  if(timeLeft<=0){
+   clearInterval(timerInterval);
+   startDraw();
+  }
+ },1000);
+}
+
+startRound();
+</script>
 </body>
-</html>
+  </html>
+    
