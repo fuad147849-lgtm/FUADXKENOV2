@@ -189,8 +189,15 @@ function buyTicket(){
 
   const name = $("player").value.trim() || "ተጫዋች";
 
-  coins -= 2;
-  showCoins();
+  const price = Number($("ticketPrice").value);
+
+if (coins < price) {
+  alert("በቂ COIN የለህም");
+  return;
+}
+
+coins -= price;
+showCoins();
 
   tickets.push({
     name:name,
